@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "start": "NODE_ENV=production node server.js",
-    "test": "playwright test",
+    "test": "node --test tests-node/calendar.test.js && playwright test",
     "test:startup": "node --test tests-node/dev-port.test.js"
   },
   "devDependencies": {

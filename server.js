@@ -26,10 +26,11 @@ const server=http.createServer(async(req,res)=>{
  if(req.method==='GET'&&parts[3]==='result'){if(!authorized(req,r))return send(res,403,{error:'لینک مدیریت معتبر نیست'});return send(res,200,{...publicRecord(r),createdAt:r.createdAt,answer:r.answer})}
  if(req.method==='POST'&&parts[3]==='answer'){
  const b=await body(req);if(!['accepted','declined'].includes(b.status))return send(res,400,{error:'پاسخ معتبر نیست'});
+ if(b.noCount!==undefined&&(!Number.isInteger(b.noCount)||b.noCount<0||b.noCount>10000))return send(res,400,{error:'تعداد پاسخ معتبر نیست'});
  if(b.status==='accepted'){
  if(typeof b.date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(b.date)||!Number.isFinite(Date.parse(b.date))||typeof b.time!=='string'||!/^([01]\d|2[0-3]):[0-5]\d$/.test(b.time)||!['پیتزا','قهوه','پاستا','کوبیده'].includes(b.food))return send(res,400,{error:'جزئیات قرار کامل نیست'});
  }
- r.answer={status:b.status,...(b.status==='accepted'?{date:b.date,time:b.time,food:b.food}:{}),updatedAt:new Date().toISOString()};save();return send(res,200,{ok:true});
+ r.answer={status:b.status,...(b.noCount!==undefined?{noCount:b.noCount}:{}),...(b.status==='accepted'?{date:b.date,time:b.time,food:b.food}:{}),updatedAt:new Date().toISOString()};save();return send(res,200,{ok:true});
  }
  return send(res,405,{error:'درخواست پشتیبانی نمی‌شود'});
  }

@@ -38,4 +38,19 @@ const server=http.createServer(async(req,res)=>{
  const target=fs.existsSync(requested)&&fs.statSync(requested).isFile()?requested:path.join(dist,'index.html');const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.woff':'font/woff','.woff2':'font/woff2'};
  res.writeHead(200,{'Content-Type':types[path.extname(target)]||'application/octet-stream','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});fs.createReadStream(target).pipe(res);
  }catch{send(res,400,{error:'ذخیره انجام نشد؛ دوباره تلاش کن'})}
-});server.listen(Number(process.env.API_PORT||3001),'0.0.0.0');
+ });
+server.on('error',error=>{
+ if(error.code==='EADDRINUSE'&&process.env.NODE_ENV==='development'&&process.env.DEV_PORT_FALLBACK==='1'){
+  console.warn('Requested API port is occupied; selecting a free port.');
+  server.listen(0,'0.0.0.0');
+ }else{
+  console.error(`API could not start: ${error.message}`);
+  process.exitCode=1;
+  if(process.connected)process.disconnect();
+ }
+});
+server.on('listening',()=>{
+ const port=server.address().port;
+ if(process.send)process.send({type:'ready',port});
+});
+server.listen(Number(process.env.API_PORT||3001),'0.0.0.0');

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>دعوت به قرار</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#fde6f1;--bg2:#e9d8ff;--ink:#4a1d3a;--soft:#8a6a7e;--rose:#d6246e;--rose2:#f0509a;--card:#fffafcdd;--mute:#efe3ec;
+color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:Vazirmatn,Tahoma,sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2));display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.card{position:relative;z-index:2;width:min(88vw,380px);background:var(--card);backdrop-filter:blur(10px);border-radius:28px;padding:28px 22px 22px;text-align:center;box-shadow:0 20px 50px #c04a8a33;min-height:300px}
+.dots{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+.dots i{width:18px;height:6px;border-radius:6px;background:#e7cbe0}
+.dots i.on{background:var(--rose);width:26px}
+.emo{font-size:44px;display:block;margin-bottom:6px;transition:transform .3s}
+h1{font-size:22px;font-weight:800;line-height:1.7}
+p.sub{font-size:13px;color:var(--soft);margin-top:6px;line-height:1.9}
+.row{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:26px;min-height:120px;flex-wrap:wrap}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-family:inherit;border:0;cursor:pointer;border-radius:999px;transition:transform .25s cubic-bezier(.3,1.5,.5,1),font-size .25s,padding .25s,opacity .25s}
+button:focus-visible,input:focus-visible{outline:3px solid var(--rose2);outline-offset:2px}
+#yes{background:linear-gradient(135deg,var(--rose),var(--rose2));color:#fff;font-weight:800;font-size:17px;padding:12px 30px;box-shadow:0 8px 20px #d6246e55;transform-origin:center}
+#no{background:var(--mute);color:var(--soft);font-size:13px;padding:8px 14px}
+.msg{min-height:26px;margin-top:10px;font-size:13px;color:var(--rose);font-weight:600}
+.btn{background:linear-gradient(135deg,var(--rose),var(--rose2));color:#fff;font-weight:800;font-size:15px;padding:12px 24px;margin-top:14px;width:100%}
+.btn.alt{background:var(--mute);color:var(--ink);font-weight:600;margin-top:8px}
+input{width:100%;font-family:inherit;font-size:16px;padding:13px 16px;border:2px solid #f1c9de;border-radius:16px;background:#fff;color:var(--ink);margin-top:18px;text-align:right}
+.link{direction:ltr;word-break:break-all;font-size:12px;background:#fff;border-radius:14px;padding:10px;margin-top:14px;color:var(--soft);text-align:left}
+.hide{display:none!important}
+.days{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.day{background:#fff;color:var(--ink);font-size:14px;font-weight:700;border-radius:14px;padding:8px 4px;border:2px solid transparent}
+.day small{display:block;font-size:11px;font-weight:400;color:var(--soft)}
+.day.sel{border-color:var(--rose);background:#ffeaf4}
+.cf{position:fixed;z-index:3;top:-14px;width:9px;height:14px;border-radius:2px;animation:dn linear forwards;pointer-events:none}
+.tp{position:fixed;z-index:9;pointer-events:none;font-size:18px;margin:-10px 0 0 -10px;animation:tp .9s ease-out forwards}
+@keyframes tp{from{transform:translate(0,0) scale(.4);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(1.15);opacity:0}}
+@keyframes dn{to{top:105vh;transform:translateX(40px) rotate(720deg)}}
+@keyframes glow{50%{filter:saturate(1.6) brightness(1.06)}}
+body.party{animation:glow 1.4s ease-in-out 5}
+.lights{position:fixed;inset:0;z-index:1;pointer-events:none;background:#2a063088;overflow:hidden;opacity:0;animation:lfade 7s ease-out forwards}
+.lights::before{content:"";position:absolute;inset:-60%;background:conic-gradient(from 0deg,#ff2d8ecc,transparent 9%,#ffc83dcc 20%,transparent 29%,#2de0b0cc 40%,transparent 49%,#7a5cffcc 60%,transparent 69%,#ff2d8ecc 80%,transparent 89%);animation:spin 6s linear infinite}
+.lights::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,#ffffffee 0,#ff9ccf99 30%,transparent 65%);animation:pulse 1s ease-in-out infinite}
+@keyframes lfade{0%{opacity:0}8%{opacity:1}75%{opacity:1}100%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.4);opacity:.45}}
+@keyframes cglow{50%{box-shadow:0 0 60px 14px #ff7ab899,0 20px 50px #c04a8a33}}
+body.party .card{animation:cglow 1s ease-in-out 7}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.opt{background:#fff;color:var(--ink);font-size:14px;font-weight:600;border-radius:18px;padding:14px 8px;border:2px solid transparent;box-shadow:0 4px 12px #c04a8a22}
+.opt span{display:block;font-size:30px;margin-bottom:2px}
+.opt.sel{border-color:var(--rose);background:#ffeaf4;transform:scale(1.04)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input[type=date],input[type=time]{text-align:center}
+.res{margin-top:16px;background:#fff;border-radius:16px;padding:12px;font-size:14px;line-height:2}
+.fl{position:fixed;z-index:1;bottom:-30px;font-size:22px;opacity:.7;animation:up linear forwards;pointer-events:none}
+@keyframes up{to{transform:translateY(-110vh) rotate(25deg);opacity:0}}
+
+</style>
+</head>
+<body>
+<main class="card" id="app"></main>
+<script>
+(function(){
+var app=document.getElementById('app');
+var h=location.hash.slice(1);
+function enc(s){var b=btoa(unescape(encodeURIComponent(s)));return b.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';return decodeURIComponent(escape(atob(t)))}catch(e){return ''}}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
+function hearts(n){for(var i=0;i<n;i++){var s=document.createElement('span');s.className='fl';s.textContent=['💖','💗','✨','🌸','💕'][i%5];s.style.left=Math.random()*95+'vw';s.style.animationDuration=(3+Math.random()*3)+'s';s.style.animationDelay=(Math.random()*1.2)+'s';document.body.appendChild(s);setTimeout(function(x){x.remove()},7500,s)}}
+function party(){var c=0,t=setInterval(function(){hearts(14);for(var i=0;i<22;i++){var e=document.createElement('span');e.className='cf';e.style.left=Math.random()*100+'vw';e.style.background=['#f0509a','#ffd166','#7ae7c7','#8f7bff','#fff'][i%5];e.style.animationDuration=(2.2+Math.random()*2.5)+'s';e.style.animationDelay=Math.random()*.6+'s';e.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(e);setTimeout(function(x){x.remove()},5600,e)}if(++c>9)clearInterval(t)},550);var L=document.createElement('div');L.className='lights';document.body.appendChild(L);setTimeout(function(){L.remove()},7200);document.body.classList.add('party')}
+function esc(t){return t.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+function creator(prefill){
+ app.innerHTML='<div class="dots"><i></i><i></i><i class="on"></i></div><span class="emo">💌</span><h1>دعوت‌نامه بساز</h1><p class="sub">اسم کسی که می‌خوای دعوتش کنی رو بنویس تا لینک مخصوصش ساخته بشه.</p>'
+ +'<input id="nm" placeholder="اسم طرف مقابل" maxlength="30" autocomplete="off" value="'+esc(prefill||'')+'">'
+ +'<button class="btn" id="mk">ساخت لینک</button>'
+ +'<div id="out" class="hide"><div class="link" id="lk"></div><button class="btn" id="cp">کپی لینک</button><button class="btn alt" id="pv">پیش‌نمایش</button></div>'
+ +'<div id="hist"></div>';
+ var base=location.href.split('#')[0];
+ var nm=document.getElementById('nm');
+ var remote=[];
+ function showHist(){var el=document.getElementById('hist');var loc=JSON.parse(store('results')||'[]');
+  var seen={},list=remote.concat(loc).filter(function(r){if(seen[r.n])return false;seen[r.n]=1;return true});
+  if(!list.length){el.innerHTML='';return}
+  el.innerHTML='<div class="res"><b>نتیجه‌ها</b><br>'+list.map(function(r){return esc(r.n)+': '+(r.a?'آره 💖'+(r.d?' — '+esc(r.d)+' ساعت '+pd(r.t)+'، '+esc(r.f||'غذا؟'):'')+' ('+pd(r.k)+' بار «نه»)':'هنوز جواب نداده')}).join('<br>')+'</div>'}
+ try{if(window.claude&&claude.use)claude.use('db').then(function(db){if(!db)return;db.collection('results').onSnapshot(function(sn){remote=sn.docs.map(function(d){return d.data()}).filter(Boolean);showHist()})}).catch(function(){})}catch(e){}
+ showHist();
+ document.getElementById('mk').onclick=function(){var v=nm.value.trim();if(!v){nm.focus();return}
+  var l=base+'#'+enc(v);document.getElementById('lk').textContent=l;document.getElementById('out').classList.remove('hide');
+  document.getElementById('cp').onclick=function(){var b=this;(navigator.clipboard?navigator.clipboard.writeText(l):Promise.reject()).then(function(){b.textContent='کپی شد ✓'}).catch(function(){var r=document.createRange();r.selectNodeContents(document.getElementById('lk'));var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='لینک رو انتخاب و کپی کن'})};
+  document.getElementById('pv').onclick=function(){location.hash=enc(v);location.reload()};
+  var list=JSON.parse(store('results')||'[]');if(!list.some(function(r){return r.n===v})){list.push({n:v,a:0,k:0});store('results',JSON.stringify(list))}showHist()}
+}
+
+function pd(s){return String(s).replace(/\d/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'[d]})}
+function dots(n){var o='<div class="dots">';for(var i=0;i<3;i++)o+='<i'+(i===n?' class="on"':'')+'></i>';return o+'</div>'}
+function invite(name){
+ var k=0,msgs=['','دکمه آره داره صدات میزنه 💗','خب دیگه بسه، فقط آره رو بزن 😅','آره همینجاست منتظره 💗','قلبمو نشکن 💔','بزن آره دیگه 😭'];
+ var faces=['🥹','🥺','😢','😭','🥹','😭'];
+ var pick={d:'',t:'20:00',f:''};
+ function save(done){var list=JSON.parse(store('results')||'[]');var f=list.filter(function(r){return r.n===name})[0];if(!f){f={n:name};list.push(f)}f.a=1;f.k=k;f.d=pick.dd||'';f.t=pick.t;f.f=pick.f;f.done=done;store('results',JSON.stringify(list));send(done)}
+ function send(done){try{if(!window.claude||!claude.use)return;claude.use('db').then(function(db){if(!db)return;return db.doc('results/'+h).set({n:name,a:1,k:k,d:pick.dd||'',t:pick.t,f:pick.f,done:done,at:Date.now()})}).catch(function(){})}catch(e){}}
+ function s1(){
+  app.innerHTML=dots(0)+'<span class="emo" id="em">🥹</span><h1>'+esc(name)+'، با من میای سر قرار؟</h1>'
+  +'<p class="sub">فقط یه سؤال ساده‌ست... جواب درستش هم فقط یکیه 😉</p>'
+  +'<div class="row"><button id="yes">آره 💗</button><button id="no">نه</button></div><div class="msg" id="ms"></div>';
+  var yes=document.getElementById('yes'),no=document.getElementById('no'),ms=document.getElementById('ms'),em=document.getElementById('em');
+  no.onclick=function(){k++;
+   yes.style.transform='scale('+Math.min(1+k*0.45,3.4)+')';yes.style.margin=(k*8)+'px '+(k*14)+'px';
+   no.style.transform='scale('+Math.max(.4,1-k*.12)+')';no.style.opacity=Math.max(.25,1-k*.12);
+   ms.textContent=msgs[Math.min(k,msgs.length-1)];em.textContent=faces[Math.min(k,faces.length-1)];
+   if(k>=7)no.classList.add('hide')};
+  yes.onclick=function(){hearts(16);yes.style.opacity=0;no.style.opacity=0;yes.disabled=no.disabled=true;save(0);setTimeout(s2,800)};
+ }
+ function s2(){
+  var days=[],i,fm=function(d,o){try{return d.toLocaleDateString('fa-IR-u-ca-persian',o)}catch(e){return ''}};
+  for(i=1;i<=7;i++){var d=new Date(Date.now()+i*864e5);days.push({iso:d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),w:fm(d,{weekday:'long'}),m:fm(d,{day:'numeric',month:'long'})})}
+  pick.d=days[0].iso;pick.dd=days[0].w+' '+days[0].m;
+  app.innerHTML=dots(1)+'<span class="emo">🗓️</span><h1>کی وقت داری؟</h1><p class="sub">یکی از روزهای هفته‌ی آینده رو انتخاب کن.</p>'
+  +'<div class="days">'+days.map(function(x,j){return '<button class="day'+(j?'':' sel')+'" data-i="'+j+'"><small>'+x.w+'</small>'+x.m+'</button>'}).join('')+'</div>'
+  +'<input type="time" id="tm" value="20:00"><button class="btn" id="nx">بعدی ✨</button>';
+  app.querySelectorAll('.day').forEach(function(b){b.onclick=function(){app.querySelectorAll('.day').forEach(function(o){o.classList.remove('sel')});b.classList.add('sel');var x=days[+b.getAttribute('data-i')];pick.d=x.iso;pick.dd=x.w+' '+x.m}});
+  document.getElementById('nx').onclick=function(){pick.t=document.getElementById('tm').value||'20:00';save(0);s3()};
+ }
+ function s3(){
+  var fs=[['🍕','پیتزا'],['☕','قهوه'],['🍢','کوبیده'],['🍝','پاستا']];
+  app.innerHTML=dots(2)+'<span class="emo">🍽️</span><h1>چی سفارش میدی؟</h1><p class="sub">یه چیز خوشمزه انتخاب کن که مهمونت باشم.</p>'
+  +'<div class="grid">'+fs.map(function(x){return '<button class="opt" data-f="'+x[1]+'"><span>'+x[0]+'</span>'+x[1]+'</button>'}).join('')+'</div>'
+  +'<button class="btn" id="go" disabled>بریم که بریم 🍽️</button>';
+  var go=document.getElementById('go');
+  app.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){app.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel')});b.classList.add('sel');pick.f=b.getAttribute('data-f');go.disabled=false}});
+  go.onclick=function(){save(1);fin()};
+ }
+ function fin(){
+  var when=pick.dd+' ساعت '+pd(pick.t);
+  app.innerHTML=dots(2)+'<span class="emo">🎉</span><h1>خوشحالم نگفتی نه!</h1><p class="sub" style="color:var(--rose);font-weight:600">پس '+esc(when)+' میام دنبالت، برای '+esc(pick.f)+' 🥂</p>'
+  +'<p class="sub">پس آماده باش، خودم میام دنبالت 🚗</p>'
+  +'<div class="res">روز: <b>'+esc(pick.dd)+'</b><br>ساعت: <b>'+pd(pick.t)+'</b><br>غذا: <b>'+esc(pick.f)+'</b><br>تعداد «نه»: <b>'+pd(k)+'</b></div></div>';
+  party();
+ }
+ s1();
+}
+
+var lastB=0;function burst(e){var t=e.touches&&e.touches[0]?e.touches[0]:e;var now=Date.now();if(now-lastB<350)return;lastB=now;for(var i=0;i<7;i++){var s=document.createElement('span');s.className='tp';s.textContent=['💗','💖','💕','🌸'][i%4];s.style.left=t.clientX+'px';s.style.top=t.clientY+'px';s.style.fontSize=(12+Math.random()*12)+'px';s.style.setProperty('--dx',(Math.random()*120-60)+'px');s.style.setProperty('--dy',(-30-Math.random()*90)+'px');document.body.appendChild(s);setTimeout(function(x){x.remove()},1000,s)}}
+['pointerdown','touchstart','mousedown','click'].forEach(function(n){document.addEventListener(n,burst,{passive:true,capture:true})});
+var name=h?dec(h):'';
+if(name)invite(name);else creator();
+})();
+</script>
+</body>
+</html>

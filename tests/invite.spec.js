@@ -11,7 +11,7 @@ test('reference CSS and all four invitation cards are identical',async({page,con
  await ref.route('**/__reference',route=>route.fulfill({contentType:'text/html',body:reference.replace(/<link href="https:\/\/fonts.googleapis.com\/[^>]+>/,()=>fonts)}));
  await ref.goto('/__reference#'+Buffer.from('سارا').toString('base64url'));
  await page.goto('/?demo=1');
- for(const p of [page,ref]){await p.evaluate(()=>document.fonts.ready);await p.addStyleTag({content:'.tp,.fl,.cf,.lights{display:none!important}*,*::before,*::after{animation:none!important;transition:none!important}'})}
+ for(const p of [page,ref]){await p.evaluate(()=>document.fonts.ready);await p.addStyleTag({content:'.tp,.fl,.cf,.lights,.fireworks-canvas,#replay-party{display:none!important}*,*::before,*::after{animation:none!important;transition:none!important}'})}
  async function compare(){const expected=await ref.locator('.card').screenshot();const actual=await page.locator('.card').screenshot();expect(actual.equals(expected)).toBeTruthy()}
  await expect(page.getByRole('heading')).toHaveText('سارا، با من میای سر قرار؟');await compare();
  for(const p of [page,ref])await p.locator('#yes').evaluate(el=>el.click());
@@ -46,4 +46,13 @@ test('server persists intermediate answers, validates answers and escapes names'
 test('touch hearts, small screens and reduced motion work',async({browser})=>{
  const context=await browser.newContext({viewport:{width:360,height:640},hasTouch:true});const page=await context.newPage();await page.goto('/?demo=1');await page.locator('#no').tap();await expect(page.locator('.tp').first()).toBeAttached();await expect(page.locator('.tp').first()).toHaveCSS('pointer-events','none');
  await page.emulateMedia({reducedMotion:'reduce'});await page.reload();await page.locator('#yes').tap();await expect(page.locator('.day')).toHaveCount(7);await page.locator('#nx').tap();await page.locator('[data-f="قهوه"]').tap();await page.locator('#go').tap();await expect(page.getByRole('heading')).toHaveText('خوشحالم نگفتی نه!');await expect(page.locator('.lights,.cf')).toHaveCount(0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();await context.close();
+});
+
+test('fireworks actually paint moving pixels and can be replayed',async({page})=>{
+ await page.goto('/?demo=1');await page.locator('#yes').click();await page.locator('#nx').click();await page.locator('[data-f="پاستا"]').click();await page.locator('#go').click();
+ const canvas=page.locator('.fireworks-canvas');await expect(canvas).toBeVisible();await expect(canvas).toHaveCSS('pointer-events','none');await expect.poll(()=>canvas.getAttribute('data-frames').then(Number)).toBeGreaterThan(10);
+ const pixels=()=>canvas.evaluate(el=>{const data=el.getContext('2d').getImageData(0,0,el.width,el.height).data;let count=0,hash=0;for(let i=3;i<data.length;i+=4)if(data[i]){count++;hash=(hash+i*data[i])%2147483647}return {count,hash}});
+ const first=await pixels();expect(first.count).toBeGreaterThan(100);await expect.poll(()=>pixels().then(p=>p.hash)).not.toBe(first.hash);await expect.poll(()=>canvas.getAttribute('data-bursts').then(Number)).toBeGreaterThan(2);
+ await page.locator('#replay-party').click();await expect(canvas).toHaveCount(1);await expect(canvas).toHaveAttribute('data-bursts','2');
+ await page.emulateMedia({reducedMotion:'reduce'});await page.locator('#replay-party').click();await expect(canvas).toBeVisible();await expect.poll(()=>canvas.getAttribute('data-frames').then(Number)).toBeGreaterThan(3);
 });

@@ -67,6 +67,11 @@ input[type=date],input[type=time]{text-align:center}
 
 </style>
 <style data-runtime-fixes>
+.celebration-particles{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:3;contain:paint}
+body.party{animation:none}
+.fireworks-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}
+#replay-party{margin-top:14px;background:linear-gradient(135deg,#d6246e,#923ee0);box-shadow:0 8px 24px #c04a8a44}
+
 body{min-height:100svh;height:auto;overflow-x:hidden;overflow-y:auto;padding:24px 0}
 html{min-height:100%}
 .card{flex-shrink:0}
@@ -87,14 +92,39 @@ function ownLinks(){try{return JSON.parse(store('invite-owner-links')||'[]')}cat
 function ownerLink(r){return location.origin+location.pathname+'#manage='+r.id+':'+r.key}
 function request(url,options){return fetch(url,options).then(function(r){return r.json().then(function(d){if(!r.ok)throw Error(d.error||'ارتباط برقرار نشد');return d})})}
 function answer(payload){if(!inviteId)return Promise.resolve();queue=queue.catch(function(){}).then(function(){return request('/api/invites/'+inviteId+'/answer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})});return queue}
-function stopParty(){partyTimers.forEach(function(t){clearInterval(t);clearTimeout(t)});partyTimers=[];partyNodes.forEach(function(el){el.remove()});partyNodes=[];document.body.classList.remove('party')}
+function stopParty(){cancelAnimationFrame(fireworkFrame);partyNodes.forEach(function(el){if(el._cleanup)el._cleanup()});document.querySelectorAll('.cf,.fl').forEach(function(el){el.remove()});partyTimers.forEach(function(t){clearInterval(t);clearTimeout(t)});partyTimers=[];partyNodes.forEach(function(el){el.remove()});partyNodes=[];document.body.classList.remove('party')}
 window.addEventListener('pagehide',stopParty);
 
 function enc(s){var b=btoa(unescape(encodeURIComponent(s)));return b.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';return decodeURIComponent(escape(atob(t)))}catch(e){return ''}}
 function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
-function hearts(n){if(reduced())return;for(var i=0;i<n;i++){var s=document.createElement('span');s.className='fl';s.textContent=['💖','💗','✨','🌸','💕'][i%5];s.style.left=Math.random()*95+'vw';s.style.animationDuration=(3+Math.random()*3)+'s';s.style.animationDelay=(Math.random()*1.2)+'s';document.body.appendChild(s);setTimeout(function(x){x.remove()},7500,s)}}
-function party(){if(reduced())return;var c=0,t=setInterval(function(){hearts(14);for(var i=0;i<22;i++){var e=document.createElement('span');e.className='cf';e.style.left=Math.random()*100+'vw';e.style.background=['#f0509a','#ffd166','#7ae7c7','#8f7bff','#fff'][i%5];e.style.animationDuration=(2.2+Math.random()*2.5)+'s';e.style.animationDelay=Math.random()*.6+'s';e.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(e);setTimeout(function(x){x.remove()},5600,e)}if(++c>9)clearInterval(t)},550);partyTimers.push(t);var L=document.createElement('div');L.className='lights';document.body.appendChild(L);partyNodes.push(L);partyTimers.push(setTimeout(function(){L.remove()},7200));document.body.classList.add('party')}
+function hearts(n){if(reduced())return;for(var i=0;i<n;i++){var s=document.createElement('span');s.className='fl';s.textContent=['💖','💗','✨','🌸','💕'][i%5];s.style.left=Math.random()*95+'vw';s.style.animationDuration=(3+Math.random()*3)+'s';s.style.animationDelay=(Math.random()*1.2)+'s';(document.querySelector('.celebration-particles')||document.body).appendChild(s);setTimeout(function(x){x.remove()},7500,s)}}
+var fireworkFrame=0;
+function fireworks(){
+ var canvas=document.createElement('canvas');canvas.className='fireworks-canvas';canvas.setAttribute('aria-hidden','true');document.body.appendChild(canvas);partyNodes.push(canvas);
+ var ctx=canvas.getContext('2d');if(!ctx){canvas.remove();return}
+ var width,height,dpr,particles=[],rockets=[],started=performance.now(),last=started,nextLaunch=0,bursts=0;
+ function resize(){width=innerWidth;height=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
+ resize();window.addEventListener('resize',resize);canvas._cleanup=function(){window.removeEventListener('resize',resize)};
+ function explode(x,y,hue){
+  bursts++;canvas.dataset.bursts=bursts;
+  for(var i=0;i<76;i++){var angle=Math.PI*2*i/76,speed=1.8+Math.random()*3.7;particles.push({x:x,y:y,px:x,py:y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:1,decay:.008+Math.random()*.007,hue:hue+Math.random()*28,size:1.1+Math.random()*1.5})}
+ }
+ // Visible immediately, followed by rockets that rise and burst across the viewport.
+ explode(width*.2,height*.18,325);explode(width*.8,height*.25,45);
+ function frame(now){
+  var age=now-started,dt=Math.min((now-last)/16.67,2);last=now;ctx.clearRect(0,0,width,height);
+  if(age>12000){cancelAnimationFrame(fireworkFrame);canvas._cleanup();canvas.remove();return}
+  if(age>=nextLaunch&&age<10500){rockets.push({x:width*(.12+Math.random()*.76),y:height+10,target:height*(.12+Math.random()*.4),hue:[325,45,165,265,15][Math.floor(Math.random()*5)]});nextLaunch=age+560}
+  ctx.globalCompositeOperation='lighter';
+  for(var r=rockets.length-1;r>=0;r--){var rocket=rockets[r];rocket.y-=10*dt;ctx.strokeStyle='hsla('+rocket.hue+',100%,78%,.85)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(rocket.x,rocket.y+32);ctx.lineTo(rocket.x,rocket.y);ctx.stroke();ctx.fillStyle='#fff5dc';ctx.beginPath();ctx.arc(rocket.x,rocket.y,2.6,0,Math.PI*2);ctx.fill();if(rocket.y<=rocket.target){explode(rocket.x,rocket.y,rocket.hue);rockets.splice(r,1)}}
+  for(var p=particles.length-1;p>=0;p--){var spark=particles[p];spark.px=spark.x;spark.py=spark.y;spark.x+=spark.vx*dt;spark.y+=spark.vy*dt;spark.vy+=.025*dt;spark.vx*=Math.pow(.985,dt);spark.life-=spark.decay*dt;if(spark.life<=0){particles.splice(p,1);continue}ctx.strokeStyle='hsla('+spark.hue+',100%,72%,'+spark.life+')';ctx.lineWidth=spark.size;ctx.beginPath();ctx.moveTo(spark.px,spark.py);ctx.lineTo(spark.x,spark.y);ctx.stroke();ctx.fillStyle='hsla('+spark.hue+',100%,85%,'+spark.life+')';ctx.beginPath();ctx.arc(spark.x,spark.y,spark.size*.8,0,Math.PI*2);ctx.fill()}
+  canvas.dataset.frames=Number(canvas.dataset.frames||0)+1;fireworkFrame=requestAnimationFrame(frame);
+ }
+ fireworkFrame=requestAnimationFrame(frame);
+}
+
+function party(force){stopParty();if(reduced()&&!force)return;fireworks();if(reduced())return;var layer=document.createElement('div');layer.className='celebration-particles';layer.setAttribute('aria-hidden','true');document.body.appendChild(layer);partyNodes.push(layer);var c=0,t=setInterval(function(){hearts(14);for(var i=0;i<22;i++){var e=document.createElement('span');e.className='cf';e.style.left=Math.random()*100+'vw';e.style.background=['#f0509a','#ffd166','#7ae7c7','#8f7bff','#fff'][i%5];e.style.animationDuration=(2.2+Math.random()*2.5)+'s';e.style.animationDelay=Math.random()*.6+'s';e.style.transform='rotate('+Math.random()*360+'deg)';layer.appendChild(e);setTimeout(function(x){x.remove()},5600,e)}if(++c>9)clearInterval(t)},550);partyTimers.push(t);var L=document.createElement('div');L.className='lights';document.body.appendChild(L);partyNodes.push(L);partyTimers.push(setTimeout(function(){L.remove()},7200));document.body.classList.add('party')}
 function esc(t){return t.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 
 function creator(prefill){
@@ -172,6 +202,7 @@ function invite(name){
   app.innerHTML=dots(2)+'<span class="emo">🎉</span><h1>خوشحالم نگفتی نه!</h1><p class="sub" style="color:var(--rose);font-weight:600">پس '+esc(when)+' میام دنبالت، برای '+esc(pick.f)+' 🥂</p>'
   +'<p class="sub">پس آماده باش، خودم میام دنبالت 🚗</p>'
   +'<div class="res">روز: <b>'+esc(pick.dd)+'</b><br>ساعت: <b>'+pd(pick.t)+'</b><br>غذا: <b>'+esc(pick.f)+'</b><br>تعداد «نه»: <b>'+pd(k)+'</b></div>';
+  var replay=document.createElement('button');replay.id='replay-party';replay.className='btn';replay.textContent='🎆 جشن رو دوباره ببین';replay.onclick=function(){party(true)};app.appendChild(replay);
   party();
  }
  s1();
